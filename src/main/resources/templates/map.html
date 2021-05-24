@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Add Map</title>
+
+    <style type="text/css">
+      /* Set the size of the div element that contains the map */
+      #map {
+        height: 400px;
+        /* The height is 400 pixels */
+        width: 100%;
+        /* The width is the width of the web page */
+      }
+    </style>
+    <script> 
+      // Initialize and add the map
+      function initMap() {
+        var address = document.getElementById('address').innerHTML;
+        var lat = [[${getLatitude}]];
+        var lng = [[${getLongitude}]];
+          
+        // The location of Uluru
+        const loc = {lat, lng};
+        // The map, centered at Uluru
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 4,
+            center: loc
+        });
+        // The marker, positioned at Uluru
+        const marker = new google.maps.Marker({
+            title: "Click to zoom",
+            position: loc,
+            map: map
+        });
+        const infowindow = new google.maps.InfoWindow({
+            content: address,
+        });
+        map.addListener("center_changed", () => {
+          // 3 seconds after the center of the map has changed, pan back to the
+          // marker.
+          window.setTimeout(() => {
+            map.panTo(marker.getPosition());
+          }, 5000);
+        });
+        marker.addListener("click", () => {
+          map.setZoom(17);
+          map.setCenter(marker.getPosition());
+          infowindow.open(marker.get("map"), marker);
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <h2 id="address" th:text="${getAddress}">My Google Maps Demo</h2>
+    <hr>
+        <h4>Click on marker to view address</h4>
+    <!--The div element for the map -->
+    <div id="map"></div>
+
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXPNW9mQfEB6ZhgTRxVnn3ITLo80aOYII&callback=initMap&libraries=&v=weekly"
+      async
+    ></script>
+  </body>
+</html>
